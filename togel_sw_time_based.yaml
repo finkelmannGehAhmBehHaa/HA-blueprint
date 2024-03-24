@@ -1,0 +1,49 @@
+blueprint:
+  name: FINK - Toggle Switch Based on Time
+  description: Automatically toggles adaptive lighting sleep mode on and off at specified times.
+  domain: automation
+  input:
+    switch_entity:
+      name: Switch Entity
+      description: The switch entity for adaptive lighting sleep mode.
+      selector:
+        entity:
+          domain: switch
+    on_time:
+      name: On Time
+      description: Time to activate sleep mode (24-hour format).
+      default: "23:30"
+      selector:
+        time: {}
+    off_time:
+      name: Off Time
+      description: Time to deactivate sleep mode (24-hour format).
+      default: "07:00"
+      selector:
+        time: {}
+
+trigger:
+  - platform: time
+    at: !input "on_time"
+    id: After On Time
+  - platform: time
+    at: !input "off_time"
+    id: After Off Time
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: "After On Time"
+        sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: !input "switch_entity"
+      - conditions:
+          - condition: trigger
+            id: "After Off Time"
+        sequence:
+          - service: switch.turn_off
+            target:
+              entity_id: !input "switch_entity"
+mode: single
