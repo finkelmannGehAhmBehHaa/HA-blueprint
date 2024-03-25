@@ -1,33 +1,33 @@
 blueprint:
-  name: FINK - Motion activated light with lux.
-  description: Turns on a light when motion is detected and luminance is below a specified threshold, turns off after no motion for a set time.
+  name: FINK - Motion-Activated Light with Conditional Lux
+  description: Turns on a light when motion is detected, but only if the luminance is below a specified threshold. If luminance is above the threshold, the automation does nothing.
   domain: automation
   input:
     motion_sensor_entity:
       name: Motion Sensor Entity
-      description: The entity that triggers motion.
+      description: "Entity that triggers motion, e.g., binary_sensor.motion_sensor."
       selector:
         entity:
           domain: binary_sensor
 
     light_entity:
       name: Light Entity
-      description: The light to be controlled.
+      description: "Light to be controlled, e.g., light.living_room."
       selector:
         entity:
           domain: light
 
     luminance_entity:
       name: Luminance Sensor
-      description: The sensor entity that measures luminance.
+      description: "Sensor entity measuring luminance, e.g., sensor.luminance_sensor."
       selector:
         entity:
           domain: sensor
 
     luminance_threshold:
       name: Luminance Threshold
-      description: The luminance level below which the light will turn on.
-      default: 100
+      description: "Luminance level (in lux) below which the light turns on."
+      default: 50
       selector:
         number:
           min: 0
@@ -36,7 +36,7 @@ blueprint:
 
     no_motion_wait_time:
       name: No Motion Wait Time
-      description: Time to wait with no motion before turning off the light.
+      description: "Time (in seconds) to wait with no motion before turning off the light."
       default: 30
       selector:
         number:
@@ -44,27 +44,25 @@ blueprint:
           max: 3600
           unit_of_measurement: seconds
 
-alias: Bewegunsmelder
-description: ""
 trigger:
   - platform: state
     entity_id: !input "motion_sensor_entity"
     from: "off"
     to: "on"
-    id: "on"
+    id: "motion_detected"
   - platform: state
     entity_id: !input "motion_sensor_entity"
     from: "on"
     to: "off"
     for:
       seconds: !input "no_motion_wait_time"
-    id: "off"
-condition: []
+    id: "no_motion"
+
 action:
   - choose:
       - conditions:
           - condition: trigger
-            id: "on"
+            id: "motion_detected"
           - condition: numeric_state
             entity_id: !input "luminance_entity"
             below: !input "luminance_threshold"
@@ -74,9 +72,10 @@ action:
               entity_id: !input "light_entity"
       - conditions:
           - condition: trigger
-            id: "off"
+            id: "no_motion"
         sequence:
           - service: light.turn_off
             target:
               entity_id: !input "light_entity"
+
 mode: restart
