@@ -1,0 +1,208 @@
+blueprint:
+  name: FINK - Tradfri 4 Set Brightness
+  description: "Controls a light with a switch given by ENTITY. \n\nShort Button press will toggle light for both Buttons (helpfull in darkness) \n\n Mode set to restart is mandatory for stop after long press to work."
+  domain: automation
+  input:
+    source_switch_e1743_action:
+      name: Tradfri E1743 Switch
+      description: The switch-action which triggers this automation.
+      selector:
+        entity:
+          filter:
+            - integration: mqtt
+              domain: sensor
+    target_light:
+      name: Target Light
+      description: the light you want to control.
+      selector:
+        target:
+    left_click_bright:
+      name: Left Click Brightness
+      description: "Brightness when the left arrow key is pressed"
+      default: 1
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: '%'
+    left_hold_bright:
+      name: Left Hold Click Brightness
+      description: "Brightness when the left arrow key is hold"
+      default: 40
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: '%'
+    right_click_bright:
+      name: Right Click Brightness
+      description: "Brightness when the right arrow key is pressed"
+      default: 100
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: '%'
+    right_hold_bright:
+      name: Right Hold Click Brightness
+      description: "Brightness when the right arrow key is hold"
+      default: 70
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: '%'
+    transition_length:
+      name: Transition length
+      description: "Length of the transition"
+      default: 1
+      selector:
+        number:
+          min: 0
+          max: 10
+          unit_of_measurement: '%'
+alias: Tradfri 4 Button 1 Light
+description: ""
+trigger:
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: "on"
+    to: "on"
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: "off"
+    to: "off"
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: brightness_move_up
+    to: brightness_move_up
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: brightness_move_down
+    to: brightness_move_down
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: brightness_stop
+    to: brightness_stop
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: arrow_left_click
+    to: arrow_left_click
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: arrow_right_click
+    to: arrow_right_click
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: arrow_left_hold
+    to: arrow_left_hold
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: arrow_right_hold
+    to: arrow_right_hold
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: arrow_left_release
+    to: arrow_left_release
+  - platform: state
+    entity_id: !input source_switch_e1743_action
+    id: arrow_right_release
+    to: arrow_right_release
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - "on"
+        sequence:
+          - service: light.toggle
+            data: {}
+            target: !input target_light
+      - conditions:
+          - condition: trigger
+            id:
+              - "off"
+        sequence:
+          - service: light.toggle
+            data: {}
+            target: !input target_light
+      - conditions:
+          - condition: trigger
+            id:
+              - brightness_move_up
+        sequence:
+          - repeat:
+              sequence:
+                - service: light.turn_on
+                  data:
+                    brightness_step_pct: 5
+                    transition: 0.2
+                  target: !input target_light
+                - delay:
+                    hours: 0
+                    minutes: 0
+                    seconds: 0
+                    milliseconds: 200
+              count: 50
+      - conditions:
+          - condition: trigger
+            id:
+              - brightness_move_down
+        sequence:
+          - repeat:
+              sequence:
+                - service: light.turn_on
+                  data:
+                    transition: 0.2
+                    brightness_step_pct: -5
+                  target: !input target_light
+                - delay:
+                    hours: 0
+                    minutes: 0
+                    seconds: 0
+                    milliseconds: 200
+              count: 50
+      - conditions:
+          - condition: trigger
+            id:
+              - arrow_right_click
+        sequence:
+          - service: light.turn_on
+            data:
+              brightness_pct: !input right_click_bright
+              transition: !input transition_length
+            target: !input target_light
+      - conditions:
+          - condition: trigger
+            id:
+              - arrow_left_click
+        sequence:
+          - service: light.turn_on
+            data:
+              brightness_pct: !input left_click_bright
+              transition: !input transition_length
+            target: !input target_light
+      - conditions:
+          - condition: trigger
+            id:
+              - arrow_right_hold
+        sequence:
+          - service: light.turn_on
+            data:
+              brightness_pct: !input right_hold_bright
+              transition: !input transition_length
+            target: !input target_light
+      - conditions:
+          - condition: trigger
+            id:
+              - arrow_left_hold
+        sequence:
+          - service: light.turn_on
+            data:
+              brightness_pct: !input left_hold_bright
+              transition: !input transition_length
+            target: !input target_light
+mode: restart
+max_exceeded: silent
+
