@@ -60,7 +60,7 @@ blueprint:
         number:
           min: 0
           max: 10
-          unit_of_measurement: '%'
+          unit_of_measurement: 's'
 alias: Tradfri 4 Button 1 Light
 description: ""
 trigger:
