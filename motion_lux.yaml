@@ -1,6 +1,8 @@
 blueprint:
-  name: FINK - Motion-Activated Light with Conditional Lux
-  description: Turns on a light when motion is detected, but only if the luminance is below a specified threshold. If luminance is above the threshold, the automation does nothing.
+  name: FINK - Motion-Activated Light with Conditional Lux and Configurable Day/Night Scenes
+  description: Turns on a light or scene when motion is detected, based on time for day/night settings,
+               but only if the luminance is below a specified threshold. If luminance is above the threshold,
+               the automation does nothing.
   domain: automation
   input:
     motion_sensor_entity:
@@ -16,6 +18,20 @@ blueprint:
       selector:
         entity:
           domain: light
+
+    day_scene:
+      name: Day Scene
+      description: "Home Assistant scene for day settings, e.g., scene.day_scene."
+      selector:
+        entity:
+          domain: scene
+
+    night_scene:
+      name: Night Scene
+      description: "Home Assistant scene for night settings, e.g., scene.night_scene."
+      selector:
+        entity:
+          domain: scene
 
     luminance_entity:
       name: Luminance Sensor
@@ -34,9 +50,23 @@ blueprint:
           max: 2000
           unit_of_measurement: lux
 
+    day_start_time:
+      name: Day Start Time
+      description: "Time when the day scene should start (e.g., 07:00)."
+      default: "07:00:00"
+      selector:
+        time: {}
+
+    night_start_time:
+      name: Night Start Time
+      description: "Time when the night scene should start (e.g., 23:00)."
+      default: "23:00:00"
+      selector:
+        time: {}
+
     no_motion_wait_time:
       name: No Motion Wait Time
-      description: "Time (in seconds) to wait with no motion before turning off the light."
+      description: "Time (in seconds) to wait with no motion before turning off the light or scene."
       default: 30
       selector:
         number:
@@ -66,10 +96,26 @@ action:
           - condition: numeric_state
             entity_id: !input "luminance_entity"
             below: !input "luminance_threshold"
+          - condition: time
+            after: !input "day_start_time"
+            before: !input "night_start_time"
         sequence:
-          - service: light.turn_on
+          - service: scene.turn_on
             target:
-              entity_id: !input "light_entity"
+              entity_id: !input "day_scene"
+      - conditions:
+          - condition: trigger
+            id: "motion_detected"
+          - condition: numeric_state
+            entity_id: !input "luminance_entity"
+            below: !input "luminance_threshold"
+          - condition: time
+            after: !input "night_start_time"
+            before: !input "day_start_time"
+        sequence:
+          - service: scene.turn_on
+            target:
+              entity_id: !input "night_scene"
       - conditions:
           - condition: trigger
             id: "no_motion"
