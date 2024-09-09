@@ -29,17 +29,19 @@ blueprint:
 
     day_scene:
       name: Day Scene
-      description: "Home Assistant scene for day settings, e.g., scene.day_scene."
+      description: "Home Assistant scene for day settings, e.g., scene.day_scene. (optional)"
       selector:
         entity:
           domain: scene
+      default: {}
 
     night_scene:
       name: Night Scene
-      description: "Home Assistant scene for night settings, e.g., scene.night_scene."
+      description: "Home Assistant scene for night settings, e.g., scene.night_scene. (optional)"
       selector:
         entity:
           domain: scene
+      default: {}
 
     luminance_entity:
       name: Luminance Sensor
@@ -68,7 +70,7 @@ blueprint:
     night_start_time:
       name: Night Start Time
       description: "Time when the night scene should start (e.g., 20:00)."
-      default: "20:00:00"
+      default: "22:00:00"
       selector:
         time: {}
 
