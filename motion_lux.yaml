@@ -1,8 +1,9 @@
 blueprint:
   name: FINK - Motion-Activated Light with Conditional Lux and Configurable Day/Night Scenes
-  description: Turns on a light or scene when motion is detected, based on time for day/night settings,
-               but only if the luminance is below a specified threshold. If luminance is above the threshold,
-               the automation does nothing.
+  description: >
+    Turns on a light or scene when motion is detected, based on time for day/night settings,
+    but only if the luminance is below a specified threshold. If luminance is above the threshold,
+    the automation does nothing. Allows toggling between using scenes or directly controlling the light.
   domain: automation
   input:
     motion_sensor_entity:
@@ -18,6 +19,13 @@ blueprint:
       selector:
         entity:
           domain: light
+
+    use_day_night_scenes:
+      name: Use Day/Night Scenes
+      description: "Enable or disable using day and night scenes. If disabled, only the light will be turned on."
+      selector:
+        boolean: {}
+      default: true
 
     day_scene:
       name: Day Scene
@@ -42,7 +50,7 @@ blueprint:
 
     luminance_threshold:
       name: Luminance Threshold
-      description: "Luminance level (in lux) below which the light turns on."
+      description: "Luminance level (in lux) below which the light or scene turns on."
       default: 50
       selector:
         number:
@@ -59,8 +67,8 @@ blueprint:
 
     night_start_time:
       name: Night Start Time
-      description: "Time when the night scene should start (e.g., 23:00)."
-      default: "23:00:00"
+      description: "Time when the night scene should start (e.g., 20:00)."
+      default: "20:00:00"
       selector:
         time: {}
 
@@ -91,31 +99,52 @@ trigger:
 action:
   - choose:
       - conditions:
+          # Motion detected and lux is below threshold
           - condition: trigger
             id: "motion_detected"
           - condition: numeric_state
             entity_id: !input "luminance_entity"
             below: !input "luminance_threshold"
-          - condition: time
-            after: !input "day_start_time"
-            before: !input "night_start_time"
         sequence:
-          - service: scene.turn_on
-            target:
-              entity_id: !input "day_scene"
-      - conditions:
-          - condition: trigger
-            id: "motion_detected"
-          - condition: numeric_state
-            entity_id: !input "luminance_entity"
-            below: !input "luminance_threshold"
-          - condition: time
-            after: !input "night_start_time"
-            before: !input "day_start_time"
-        sequence:
-          - service: scene.turn_on
-            target:
-              entity_id: !input "night_scene"
+          - choose:
+              - conditions:
+                  # If using day/night scenes
+                  - condition: template
+                    value_template: !input use_day_night_scenes
+                sequence:
+                  - choose:
+                      # During the day
+                      - conditions:
+                          - condition: time
+                            after: !input "day_start_time"
+                            before: !input "night_start_time"
+                        sequence:
+                          - service: scene.turn_on
+                            target:
+                              entity_id: !input "day_scene"
+                      # During the night (crosses midnight)
+                      - conditions:
+                          - condition: or
+                            conditions:
+                              - condition: time
+                                after: !input "night_start_time"
+                              - condition: time
+                                before: !input "day_start_time"
+                        sequence:
+                          - service: scene.turn_on
+                            target:
+                              entity_id: !input "night_scene"
+              - conditions:
+                  # If NOT using day/night scenes
+                  - condition: template
+                    value_template: not is_state('input_boolean.use_day_night_scenes', 'on')
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id: !input "light_entity"
+
+  # Turn off the light when no motion is detected
+  - choose:
       - conditions:
           - condition: trigger
             id: "no_motion"
