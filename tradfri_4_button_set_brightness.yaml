@@ -134,7 +134,7 @@ action:
       - conditions:
           - condition: trigger
             id:
-              - brightness_move_up
+              - long_press_up
         sequence:
           - repeat:
               sequence:
@@ -152,7 +152,7 @@ action:
       - conditions:
           - condition: trigger
             id:
-              - brightness_move_down
+              - long_press_down
         sequence:
           - repeat:
               sequence:
