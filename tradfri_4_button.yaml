@@ -1,73 +1,77 @@
 blueprint:
   name: FINK - Tradfri 4 Button
-  description: "Controls a light with a switch given by ENTITY. \n\nShort Button press will toggle light for both Buttons (helpfull in darkness) \n\n Mode set to restart is mandatory for stop after long press to work."
+  description: "Controls a light with a switch given by device. \n\nShort Button press will toggle light for both Buttons (helpfull in darkness) \n\n Mode set to restart is mandatory for stop after long press to work."
   domain: automation
   input:
-    source_switch_e1743_action:
+    source_switch:
       name: Tradfri E1743 Switch
-      description: The switch-action which triggers this automation.
+      description: The switch to trigger this automation.
       selector:
-        entity:
+        device:
           filter:
             - integration: mqtt
-              domain: sensor
     target_light:
       name: Target Light
-      description: the light you want to control.
+      description: The light you want to control.
       selector:
         target:
     target_light_2:
       name: Target Light 2
-      description: the light you want to control with the left and right button
+      description: The light you want to control with the left and right button.
       selector:
         target:
 alias: Tradfri 4 Button
 description: ""
 trigger:
-  - platform: state
-    entity_id: !input source_switch_e1743_action
+  - trigger: device
+    domain: mqtt
+    device_id: !input source_switch
+    type: action
+    subtype: "on"
     id: "on"
-    to: "on"
-  - platform: state
-    entity_id: !input source_switch_e1743_action
+  - trigger: device
+    domain: mqtt
+    device_id: !input source_switch
+    type: action
+    subtype: "off"
     id: "off"
-    to: "off"
-  - platform: state
-    entity_id: !input source_switch_e1743_action
-    id: brightness_move_up
-    to: brightness_move_up
-  - platform: state
-    entity_id: !input source_switch_e1743_action
-    id: brightness_move_down
-    to: brightness_move_down
-  - platform: state
-    entity_id: !input source_switch_e1743_action
-    id: brightness_stop
-    to: brightness_stop
-  - platform: state
-    entity_id: !input source_switch_e1743_action
+  - trigger: device
+    domain: mqtt
+    device_id: !input source_switch
+    type: action
+    subtype: brightness_move_up
+    id: long_press_up
+  - trigger: device
+    domain: mqtt
+    device_id: !input source_switch
+    type: action
+    subtype: brightness_move_down
+    id: long_press_down
+  - trigger: device
+    domain: mqtt
+    device_id: !input source_switch
+    type: action
+    subtype: arrow_left_click
     id: arrow_left_click
-    to: arrow_left_click
-  - platform: state
-    entity_id: !input source_switch_e1743_action
+  - trigger: device
+    domain: mqtt
+    device_id: !input source_switch
+    type: action
+    subtype: arrow_right_click
     id: arrow_right_click
-    to: arrow_right_click
-  - platform: state
-    entity_id: !input source_switch_e1743_action
+  - trigger: device
+    domain: mqtt
+    device_id: !input source_switch
+    type: action
+    subtype: arrow_left_hold
     id: arrow_left_hold
-    to: arrow_left_hold
-  - platform: state
-    entity_id: !input source_switch_e1743_action
+  - trigger: device
+    domain: mqtt
+    device_id: !input source_switch
+    type: action
+    subtype: arrow_right_hold
     id: arrow_right_hold
-    to: arrow_right_hold
-  - platform: state
-    entity_id: !input source_switch_e1743_action
-    id: arrow_left_release
-    to: arrow_left_release
-  - platform: state
-    entity_id: !input source_switch_e1743_action
-    id: arrow_right_release
-    to: arrow_right_release
+
 condition: []
 action:
   - choose:
@@ -76,7 +80,7 @@ action:
             id:
               - "on"
         sequence:
-          - service: light.toggle
+          - action: light.toggle
             data: {}
             target: !input target_light
       - conditions:
@@ -84,17 +88,17 @@ action:
             id:
               - "off"
         sequence:
-          - service: light.toggle
+          - action: light.toggle
             data: {}
             target: !input target_light
       - conditions:
           - condition: trigger
             id:
-              - brightness_move_up
+              - long_press_up
         sequence:
           - repeat:
               sequence:
-                - service: light.turn_on
+                - action: light.turn_on
                   data:
                     brightness_step_pct: 5
                     transition: 0.2
@@ -108,11 +112,11 @@ action:
       - conditions:
           - condition: trigger
             id:
-              - brightness_move_down
+              - long_press_down
         sequence:
           - repeat:
               sequence:
-                - service: light.turn_on
+                - action: light.turn_on
                   data:
                     transition: 0.2
                     brightness_step_pct: -5
@@ -128,7 +132,7 @@ action:
             id:
               - arrow_right_click
         sequence:
-          - service: light.toggle
+          - action: light.toggle
             data: {}
             target: !input target_light_2
       - conditions:
@@ -136,7 +140,7 @@ action:
             id:
               - arrow_left_click
         sequence:
-          - service: light.toggle
+          - action: light.toggle
             data: {}
             target: !input target_light_2
       - conditions:
@@ -146,7 +150,7 @@ action:
         sequence:
           - repeat:
               sequence:
-                - service: light.turn_on
+                - action: light.turn_on
                   data:
                     brightness_step_pct: 5
                     transition: 0.2
@@ -164,7 +168,7 @@ action:
         sequence:
           - repeat:
               sequence:
-                - service: light.turn_on
+                - action: light.turn_on
                   data:
                     transition: 0.2
                     brightness_step_pct: -5
