@@ -1,13 +1,13 @@
 blueprint:
   name: FINK - Tradfri 4 Button 1 Light
-  description: "Controls a light with a switch given by ENTITY. \n\nShort Button press will toggle light for both Buttons (helpfull in darkness) \n\n Mode set to restart is mandatory for stop after long press to work.\n\nAlso 4 custom actions for the arrow keys"
+  description: "Controls a light with a switch given by device. \n\nShort Button press will toggle light for both Buttons (helpfull in darkness) \n\n Mode set to restart is mandatory for stop after long press to work.\n\nAlso 4 custom actions for the arrow keys"
   domain: automation
   input:
-    source_switch_e1743_action:
+    source_switch:
       name: Tradfri E1743 Switch
       description: The switch-action which triggers this automation.
       selector:
-        entity:
+        device:
           filter:
             - integration: mqtt
     target_light:

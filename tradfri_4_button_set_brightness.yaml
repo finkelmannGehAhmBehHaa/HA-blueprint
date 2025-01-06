@@ -3,11 +3,11 @@ blueprint:
   description: "This blueprint allows control of a light using a Tradfri E1743 switch. It toggles the light, adjusts brightness in steps, and sets specific brightness levels with button presses and holds. Customize brightness levels and transitions for a flexible lighting experience."
   domain: automation
   input:
-    source_switch_e1743_action:
+    source_switch:
       name: Tradfri E1743 Switch
       description: The switch-action which triggers this automation.
       selector:
-        entity:
+        device:
           filter:
             - integration: mqtt
     target_light:
