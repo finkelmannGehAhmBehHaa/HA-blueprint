@@ -1,10 +1,10 @@
 blueprint:
-  name: FINK - Tradfri 4 Set Brightness
-  description: "This blueprint allows control of a light using a Tradfri E1743 switch. It toggles the light, adjusts brightness in steps, and sets specific brightness levels with button presses and holds. Customize brightness levels and transitions for a flexible lighting experience."
+  name: FINK - Ikea Remote Z2M 4 button 1 light set brightness
+  description: "This blueprint allows control of a light using a Ikea Remote Z2M switch. It toggles the light, adjusts brightness in steps, and sets specific brightness levels with button presses and holds. Customize brightness levels and transitions for a flexible lighting experience."
   domain: automation
   input:
     source_switch:
-      name: Tradfri E1743 Switch
+      name: Ikea Remote Z2M Switch
       description: The switch-action which triggers this automation.
       selector:
         device:
@@ -60,7 +60,7 @@ blueprint:
           min: 0
           max: 10
           unit_of_measurement: "s"
-alias: Tradfri 4 Button 1 Light
+alias: Ikea Remote Z2M 4 Button 1 Light
 description: ""
 trigger:
   - trigger: device

@@ -1,10 +1,10 @@
 blueprint:
-  name: FINK - Tradfri 2 Button
+  name: FINK - Ikea Remote Z2M 2 Button 1 Light
   description: "Controls a light with a switch given by ENTITY. \n\nShort Button press will toggle light for both Buttons (helpfull in darkness) \n\n Mode set to restart is mandatory for stop after long press to work."
   domain: automation
   input:
     source_switch:
-      name: Tradfri Switch
+      name: Ikea Remote Z2M Switch
       description: The switch to trigger this automation.
       selector:
         device:
@@ -16,7 +16,7 @@ blueprint:
       selector:
         target:
 
-alias: Tradfri 2 Button
+alias: Ikea Remote Z2M 2 Button
 description: ""
 trigger:
   - trigger: device
