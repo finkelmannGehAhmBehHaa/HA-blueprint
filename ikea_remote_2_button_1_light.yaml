@@ -43,6 +43,12 @@ trigger:
     type: action
     subtype: brightness_move_down
     id: long_press_down
+  - trigger: device
+    domain: mqtt
+    device_id: !input source_switch
+    type: action
+    subtype: brightness_stop
+    id: brightness_stop
 
 condition: []
 action:

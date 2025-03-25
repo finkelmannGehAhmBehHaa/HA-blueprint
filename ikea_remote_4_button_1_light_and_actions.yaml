@@ -90,6 +90,12 @@ trigger:
     type: action
     subtype: arrow_right_hold
     id: arrow_right_hold
+  - trigger: device
+    domain: mqtt
+    device_id: !input source_switch
+    type: action
+    subtype: brightness_stop
+    id: brightness_stop
 
 condition: []
 action:
