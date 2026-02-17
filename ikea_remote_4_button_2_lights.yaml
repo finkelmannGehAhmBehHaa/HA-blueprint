@@ -10,16 +10,19 @@ blueprint:
         device:
           filter:
             - integration: mqtt
+
     target_light:
       name: Target Light
       description: The light you want to control.
       selector:
         target:
+
     target_light_2:
       name: Target Light 2
       description: The light you want to control with the left and right button.
       selector:
         target:
+
 alias: Ikea Remote Z2M 4 Button
 description: ""
 trigger:
@@ -29,60 +32,70 @@ trigger:
     type: action
     subtype: "on"
     id: "on"
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: "off"
     id: "off"
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: brightness_move_up
     id: long_press_up
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: brightness_move_down
     id: long_press_down
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: arrow_left_click
     id: arrow_left_click
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: arrow_right_click
     id: arrow_right_click
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: arrow_left_hold
     id: arrow_left_hold
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: arrow_right_hold
     id: arrow_right_hold
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: brightness_stop
     id: brightness_stop
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: arrow_right_release
     id: arrow_right_release
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
@@ -98,17 +111,19 @@ action:
             id:
               - "on"
         sequence:
-          - action: light.toggle
+          - action: light.turn_on
             data: {}
             target: !input target_light
+
       - conditions:
           - condition: trigger
             id:
               - "off"
         sequence:
-          - action: light.toggle
+          - action: light.turn_off
             data: {}
             target: !input target_light
+
       - conditions:
           - condition: trigger
             id:
@@ -127,6 +142,7 @@ action:
                     seconds: 0
                     milliseconds: 200
               count: 50
+
       - conditions:
           - condition: trigger
             id:
@@ -145,22 +161,25 @@ action:
                     seconds: 0
                     milliseconds: 200
               count: 50
+
       - conditions:
           - condition: trigger
             id:
               - arrow_right_click
         sequence:
-          - action: light.toggle
+          - action: light.turn_on
             data: {}
             target: !input target_light_2
+
       - conditions:
           - condition: trigger
             id:
               - arrow_left_click
         sequence:
-          - action: light.toggle
+          - action: light.turn_off
             data: {}
             target: !input target_light_2
+
       - conditions:
           - condition: trigger
             id:
@@ -179,6 +198,7 @@ action:
                     seconds: 0
                     milliseconds: 200
               count: 50
+
       - conditions:
           - condition: trigger
             id:
@@ -197,4 +217,5 @@ action:
                     seconds: 0
                     milliseconds: 200
               count: 50
+
 mode: restart

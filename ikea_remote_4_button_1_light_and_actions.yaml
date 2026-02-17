@@ -10,35 +10,41 @@ blueprint:
         device:
           filter:
             - integration: mqtt
+
     target_light:
       name: Target Light
       description: the light you want to control.
       selector:
         target:
+
     button_left_click:
       name: Left button - short press
       description: Action to run when SHORT press on LEFT arrow button
       default: []
       selector:
         action: {}
+
     button_left_hold:
       name: Left button - hold
       description: Action to run when HOLD press on LEFT arrow button
       default: []
       selector:
         action: {}
+
     button_right_click:
       name: Right button - short press
       description: Action to run when SHORT press on RIGHT arrow button
       default: []
       selector:
         action: {}
+
     button_right_hold:
       name: Right button - hold
       description: Action to run when HOLD press on RIGHT arrow button
       default: []
       selector:
         action: {}
+
 alias: Ikea Remote Z2M 4 Button 1 Light
 description: ""
 trigger:
@@ -48,48 +54,56 @@ trigger:
     type: action
     subtype: "on"
     id: "on"
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: "off"
     id: "off"
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: brightness_move_up
     id: long_press_up
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: brightness_move_down
     id: long_press_down
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: arrow_left_click
     id: arrow_left_click
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: arrow_right_click
     id: arrow_right_click
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: arrow_left_hold
     id: arrow_left_hold
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
     type: action
     subtype: arrow_right_hold
     id: arrow_right_hold
+
   - trigger: device
     domain: mqtt
     device_id: !input source_switch
@@ -105,17 +119,19 @@ action:
             id:
               - "on"
         sequence:
-          - action: light.toggle
+          - action: light.turn_on
             data: {}
             target: !input target_light
+
       - conditions:
           - condition: trigger
             id:
               - "off"
         sequence:
-          - action: light.toggle
+          - action: light.turn_off
             data: {}
             target: !input target_light
+
       - conditions:
           - condition: trigger
             id:
@@ -134,6 +150,7 @@ action:
                     seconds: 0
                     milliseconds: 200
               count: 50
+
       - conditions:
           - condition: trigger
             id:
@@ -152,25 +169,30 @@ action:
                     seconds: 0
                     milliseconds: 200
               count: 50
+
       - conditions:
           - condition: trigger
             id:
               - arrow_right_click
         sequence: !input "button_right_click"
+
       - conditions:
           - condition: trigger
             id:
               - arrow_left_click
         sequence: !input "button_left_click"
+
       - conditions:
           - condition: trigger
             id:
               - arrow_right_hold
         sequence: !input "button_right_hold"
+
       - conditions:
           - condition: trigger
             id:
               - arrow_left_hold
         sequence: !input "button_left_hold"
+
 mode: restart
 max_exceeded: silent
