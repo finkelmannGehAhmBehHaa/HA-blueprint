@@ -1,6 +1,6 @@
 blueprint:
   name: FINK - Ikea Remote Z2M 4 Button 1 Light
-  description: "Controls a light with a switch given by device. \n\nShort Button press will toggle light for both Buttons (helpfull in darkness) \n\n Mode set to restart is mandatory for stop after long press to work.\n\nAlso 4 custom actions for the arrow keys"
+  description: "Controls a light with a switch given as device. The On and Off buttons controll one light. A long press dimms it. The short and long press on the left and right buttons will exectue a customizable action."
   domain: automation
   input:
     source_switch:

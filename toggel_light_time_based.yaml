@@ -1,6 +1,6 @@
 blueprint:
   name: FINK - Toggle Light Based on Time
-  description: Automatically toggel a light
+  description: Automatically toggel a light at specified times.
   domain: automation
   input:
     switch_entity:
