@@ -84,6 +84,9 @@ blueprint:
           max: 3600
           unit_of_measurement: seconds
 
+variables:
+  use_day_night_scenes: !input use_day_night_scenes
+
 trigger:
   - platform: state
     entity_id: !input "motion_sensor_entity"
@@ -112,7 +115,7 @@ action:
               - conditions:
                   # If using day/night scenes
                   - condition: template
-                    value_template: !input use_day_night_scenes
+                    value_template: "{{ use_day_night_scenes }}"
                 sequence:
                   - choose:
                       # During the day
@@ -139,7 +142,7 @@ action:
               - conditions:
                   # If NOT using day/night scenes
                   - condition: template
-                    value_template: not is_state('input_boolean.use_day_night_scenes', 'on')
+                    value_template: "{{ not use_day_night_scenes }}"
                 sequence:
                   - service: light.turn_on
                     target:
