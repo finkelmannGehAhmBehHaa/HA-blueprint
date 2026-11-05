@@ -1,6 +1,6 @@
 blueprint:
   name: FINK - Ikea Remote Z2M 4 Button 1 Light
-  description: "Controls a light with a switch given as device. The On and Off buttons controll one light. A long press dimms it. The short and long press on the left and right buttons will exectue a customizable action."
+  description: "Actions for the left, left-hold right, right-hold, on, off clicks. And dimms a light on brightness_move_up / down."
   domain: automation
   input:
     source_switch:
@@ -11,36 +11,49 @@ blueprint:
           filter:
             - integration: mqtt
 
-    target_light:
-      name: Target Light
-      description: the light you want to control.
+    dimm_light:
+      name: Dimm Light
+      description: The light you want to dim control.
       selector:
         target:
 
+    off_light:
+      name: Off Light
+      description: Light to turn off when press off.
+      selector:
+        target:
+
+    button_on_click:
+      name: On button - short press
+      description: Action to run when SHORT press on the ON button.
+      default: []
+      selector:
+        action: {}
+
     button_left_click:
       name: Left button - short press
-      description: Action to run when SHORT press on LEFT arrow button
+      description: Action to run when SHORT press on LEFT arrow button.
       default: []
       selector:
         action: {}
 
     button_left_hold:
       name: Left button - hold
-      description: Action to run when HOLD press on LEFT arrow button
+      description: Action to run when HOLD press on LEFT arrow button.
       default: []
       selector:
         action: {}
 
     button_right_click:
       name: Right button - short press
-      description: Action to run when SHORT press on RIGHT arrow button
+      description: Action to run when SHORT press on RIGHT arrow button.
       default: []
       selector:
         action: {}
 
     button_right_hold:
       name: Right button - hold
-      description: Action to run when HOLD press on RIGHT arrow button
+      description: Action to run when HOLD press on RIGHT arrow button.
       default: []
       selector:
         action: {}
@@ -118,10 +131,7 @@ action:
           - condition: trigger
             id:
               - "on"
-        sequence:
-          - action: light.turn_on
-            data: {}
-            target: !input target_light
+        sequence: !input "button_on_click"
 
       - conditions:
           - condition: trigger
@@ -130,7 +140,7 @@ action:
         sequence:
           - action: light.turn_off
             data: {}
-            target: !input target_light
+            target: !input off_light
 
       - conditions:
           - condition: trigger
@@ -143,7 +153,7 @@ action:
                   data:
                     brightness_step_pct: 5
                     transition: 0.2
-                  target: !input target_light
+                  target: !input dimm_light
                 - delay:
                     hours: 0
                     minutes: 0
@@ -162,7 +172,7 @@ action:
                   data:
                     transition: 0.2
                     brightness_step_pct: -5
-                  target: !input target_light
+                  target: !input dimm_light
                 - delay:
                     hours: 0
                     minutes: 0
